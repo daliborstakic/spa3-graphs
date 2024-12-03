@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Compiled class file
 *.class
 
@@ -22,3 +23,24 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+=======
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# IDE-specific files
+/.idea/
+/.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Other files to exclude
+*.jar
+*.war
+*.ear
+
+>>>>>>> 65242a3 (Add .gitignore)
