@@ -24,7 +24,7 @@ import edu.princeton.cs.algs4.IndexMinPQ;
 
 public class WeightedGraph {
 	private final static Random random = new Random();
-	private final Map<Integer, Set<Edge>> graph = new HashMap<>();
+	private final Map<Integer, List<Edge>> graph = new HashMap<>();
 	private final TreeMap<Double, Set<Integer>> importance = new TreeMap<>(Collections.reverseOrder());
 	private List<Edge> edges;
 	private int numOfVertices;
@@ -38,7 +38,7 @@ public class WeightedGraph {
 			numOfEdges = Integer.parseInt(reader.readLine());
 
 			for (int i = 0; i < numOfVertices; i++) {
-				graph.put(i, new HashSet<>());
+				graph.put(i, new ArrayList<>());
 			}
 
 			Map<Integer, Double> tempImportance = new HashMap<>();
@@ -78,9 +78,10 @@ public class WeightedGraph {
 
 	public void addEdge(int source, int target, double weight) {
 		graph.get(source).add(new Edge(source, target, weight));
+		graph.get(target).add(new Edge(target, source, weight));
 	}
 
-	public Set<Edge> adj(int vertex) {
+	public List<Edge> adj(int vertex) {
 		return graph.get(vertex);
 	}
 
@@ -191,6 +192,7 @@ public class WeightedGraph {
 
 			for (Edge e : adj(v)) {
 				int w = e.other(v);
+
 				double newWeight = distTo[v] + e.getWeight();
 
 				if (capacity - e.getWeight() < 0)
@@ -200,11 +202,10 @@ public class WeightedGraph {
 					distTo[w] = newWeight;
 					edgeTo[w] = e;
 
-					if (pq.contains(w)) {
+					if (pq.contains(w))
 						pq.decreaseKey(w, newWeight);
-					} else {
+					else
 						pq.insert(w, newWeight);
-					}
 
 					if (w % 2 == 0 || w == source || w == target)
 						capacity = maxWeight;
@@ -234,7 +235,7 @@ public class WeightedGraph {
 	private void relaxN(Edge e, int v, double[] distTo, Edge[] edgeTo, IndexMinPQ<Double> pq, double maxWeight) {
 		int w = e.other(v);
 
-		if (distTo[w] > distTo[v] + e.getWeight() && distTo[v] + e.getWeight() <= maxWeight) {
+		if (distTo[w] > distTo[v] + e.getWeight() && e.getWeight() <= maxWeight) {
 			distTo[w] = distTo[v] + e.getWeight();
 			edgeTo[w] = e;
 
@@ -264,6 +265,7 @@ public class WeightedGraph {
 
 	private Stack<Edge> buildPath(Edge[] edgeTo, int target) {
 		Stack<Edge> path = new Stack<>();
+
 		for (Edge e = edgeTo[target]; e != null; e = edgeTo[e.other(e.either())]) {
 			path.push(e);
 		}

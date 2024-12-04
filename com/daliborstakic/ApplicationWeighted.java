@@ -10,16 +10,16 @@ import com.daliborstakic.util.Edge;
 
 public class ApplicationWeighted {
 	public static void main(String[] args) {
-		WeightedGraph graph = new WeightedGraph("usm-tez1.txt");
+		WeightedGraph graph = new WeightedGraph("neusm-t1.txt");
 		System.out.println("Graph:\n" + graph);
 
 		displayMostImportantNode(graph);
 		displayLeastImportantNodes(graph);
 		displayShortestPathBetweenNodes(graph, 5, 9);
 		displayShortestPathsFromNode(graph, 0);
-		displayShortestPathWithWeightLimit(graph, 5, 2, 100.0);
+		displayShortestPathWithWeightLimit(graph, 2, 5, 100.0);
 		displayShortestPathWithEvenNodes(graph, 9, 0, 10.0);
-		displayShortestPathWithEvenAndOddNodes(graph, 2, 7, 10.0);
+		displayShortestPathWithEvenAndOddNodes(graph, 2, 6, 10.0);
 		displayMSTKruskals(graph);
 		displayMSTKruskalsWithEdge(graph);
 	}
@@ -79,7 +79,7 @@ public class ApplicationWeighted {
 	private static void displayMSTKruskals(WeightedGraph graph) {
 		List<Edge> mst = graph.kruskals();
 
-		System.out.println("Minimum Spanning Tree Edges:");
+		System.out.println("\nMinimum Spanning Tree Edges:");
 		for (Edge edge : mst) {
 			System.out.println(edge.getSource() + " - " + edge.getTarget() + " : " + edge.getWeight());
 		}
@@ -89,7 +89,7 @@ public class ApplicationWeighted {
 		Edge randomEdge = graph.getRandomEdge();
 		List<Edge> mst = graph.kruskalsWithEdge(randomEdge);
 
-		System.out.println("Minimum Spanning Tree Edges with Edge " + randomEdge + ": ");
+		System.out.println("\nMinimum Spanning Tree Edges with Edge " + randomEdge + ": ");
 		for (Edge edge : mst) {
 			System.out.println(edge.getSource() + " - " + edge.getTarget() + " : " + edge.getWeight());
 		}
