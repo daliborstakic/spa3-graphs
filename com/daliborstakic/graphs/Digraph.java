@@ -126,6 +126,7 @@ public class Digraph {
 		for (int i = 0; i < numOfVertices; i++) {
 			if (!visited[i]) {
 				Deque<Integer> cycle = new LinkedList<>();
+
 				if (findCycle(i, visited, recStack, cycle)) {
 					while (cycle.peekFirst() != cycle.peekLast()) {
 						cycle.pollFirst();

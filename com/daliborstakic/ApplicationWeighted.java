@@ -19,6 +19,7 @@ public class ApplicationWeighted {
 		displayShortestPathsFromNode(graph, 0);
 		displayShortestPathWithWeightLimit(graph, 5, 2, 100.0);
 		displayShortestPathWithEvenNodes(graph, 9, 0, 10.0);
+		displayShortestPathWithEvenAndOddNodes(graph, 2, 7, 10.0);
 		displayMSTKruskals(graph);
 		displayMSTKruskalsWithEdge(graph);
 	}
@@ -66,6 +67,13 @@ public class ApplicationWeighted {
 		System.out.println("(6) Path from node " + source + " to node " + target + " with weight less than "
 				+ weightLimit + " and only even nodes: "
 				+ Arrays.asList(graph.shortestPathEven(source, target, weightLimit)));
+	}
+
+	private static void displayShortestPathWithEvenAndOddNodes(WeightedGraph graph, int source, int target,
+			double weightLimit) {
+		System.out.println("(7) Path from node " + source + " to node " + target + " with weight less than "
+				+ weightLimit + " and only reseting weight at even nodes: "
+				+ Arrays.asList(graph.shortestPathEvenAndOdd(source, target, weightLimit)));
 	}
 
 	private static void displayMSTKruskals(WeightedGraph graph) {

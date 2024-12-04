@@ -176,6 +176,47 @@ public class WeightedGraph {
 		return buildPath(edgeTo, target);
 	}
 
+	public Stack<Edge> shortestPathEvenAndOdd(int source, int target, double maxWeight) {
+		double[] distTo = new double[numOfVertices];
+		Edge[] edgeTo = new Edge[numOfVertices];
+		Arrays.fill(distTo, Double.POSITIVE_INFINITY);
+		distTo[source] = 0.0;
+		double capacity = maxWeight;
+
+		IndexMinPQ<Double> pq = new IndexMinPQ<>(numOfVertices);
+		pq.insert(source, 0.0);
+
+		while (!pq.isEmpty()) {
+			int v = pq.delMin();
+
+			for (Edge e : adj(v)) {
+				int w = e.other(v);
+				double newWeight = distTo[v] + e.getWeight();
+
+				if (capacity - e.getWeight() < 0)
+					continue;
+
+				if (newWeight < distTo[w]) {
+					distTo[w] = newWeight;
+					edgeTo[w] = e;
+
+					if (pq.contains(w)) {
+						pq.decreaseKey(w, newWeight);
+					} else {
+						pq.insert(w, newWeight);
+					}
+
+					if (w % 2 == 0 || w == source || w == target)
+						capacity = maxWeight;
+					else
+						capacity -= e.getWeight();
+				}
+			}
+		}
+
+		return buildPath(edgeTo, target);
+	}
+
 	private void relax(Edge e, int v, double[] distTo, Edge[] edgeTo, IndexMinPQ<Double> pq) {
 		int w = e.other(v);
 
