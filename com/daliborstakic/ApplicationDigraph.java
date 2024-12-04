@@ -3,7 +3,9 @@ package com.daliborstakic;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+
 import com.daliborstakic.graphs.Digraph;
+import com.daliborstakic.util.Edge;
 
 public class ApplicationDigraph {
 	public static void main(String[] args) {
@@ -19,6 +21,7 @@ public class ApplicationDigraph {
 		displayTransitiveClosure(graph);
 		displayMotherVertex(graph);
 		displayReachableCandidate(graph);
+		displaySpanningTree(graph);
 	}
 
 	private static void displayWeakComponents(Digraph graph) {
@@ -91,6 +94,20 @@ public class ApplicationDigraph {
 			System.out.printf("Node that can be reached from all: %d%n", candidate);
 		} else {
 			System.out.println("There is no node that can be reached from all.");
+		}
+	}
+
+	private static void displaySpanningTree(Digraph graph) {
+		List<Edge> mst = graph.findSpanningTree();
+
+		if (mst.isEmpty()) {
+			System.out.println("The graph is disconnected so no spanning tree can exist!");
+			return;
+		}
+
+		System.out.println("Minimum Spanning Tree Edges:");
+		for (Edge edge : mst) {
+			System.out.println(edge.getSource() + " - " + edge.getTarget() + " : " + edge.getWeight());
 		}
 	}
 }

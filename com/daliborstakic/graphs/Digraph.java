@@ -13,6 +13,9 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 
+import com.daliborstakic.util.Edge;
+import com.daliborstakic.util.Subset;
+
 public class Digraph {
 	private int numOfVertices;
 	private int numOfEdges;
@@ -21,12 +24,14 @@ public class Digraph {
 	private List<Set<Integer>> graph;
 	private List<Set<Integer>> reverse;
 	private List<Set<Integer>> transitiveClosure = null;
+	private List<Edge> edges;
 	private Graph undirectedGraph;
 
 	public Digraph(String filename) {
 		this.graph = new ArrayList<>();
 		this.reverse = new ArrayList<>();
 		this.undirectedGraph = new Graph(filename);
+		this.edges = new ArrayList<>();
 
 		try (Scanner s = new Scanner(new File(filename))) {
 			initializeGraph(s);
@@ -68,6 +73,7 @@ public class Digraph {
 			int vertex2 = Integer.parseInt(tokens[1]);
 
 			this.addEdge(vertex1, vertex2);
+			this.edges.add(new Edge(vertex1, vertex2, 0.0));
 
 			this.outdegree[vertex1]++;
 			this.indegree[vertex2]++;
@@ -344,6 +350,31 @@ public class Digraph {
 		}
 	}
 
+	// This function is just Kruskals algorithm, but with no PriorityQueue
+	// It is not a minimal spanning tree, so a regular list is adequate.
+	public List<Edge> findSpanningTree() {
+		List<Edge> spanningTree = new ArrayList<>(numOfVertices - 1);
+		Subset[] subsets = new Subset[numOfVertices];
+
+		for (int i = 0; i < numOfVertices; i++)
+			subsets[i] = new Subset(i, 0);
+
+		for (Edge edge : edges) {
+			int x = Subset.findRoot(subsets, edge.getSource());
+			int y = Subset.findRoot(subsets, edge.getTarget());
+
+			if (x != y) {
+				Subset.union(subsets, x, y);
+				spanningTree.add(edge);
+			}
+		}
+
+		if (spanningTree.size() != numOfVertices - 1)
+			return new ArrayList<>();
+
+		return spanningTree;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -355,6 +386,7 @@ public class Digraph {
 			for (int neighbor : graph.get(i)) {
 				sb.append(neighbor).append(" ");
 			}
+
 			sb.append("\n");
 		}
 
