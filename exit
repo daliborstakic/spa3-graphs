@@ -1,0 +1,217 @@
+[1mdiff --git a/com/daliborstakic/ApplicationDigraph.java b/com/daliborstakic/ApplicationDigraph.java[m
+[1mindex 2e50568..01b795e 100644[m
+[1m--- a/com/daliborstakic/ApplicationDigraph.java[m
+[1m+++ b/com/daliborstakic/ApplicationDigraph.java[m
+[36m@@ -7,7 +7,7 @@[m [mimport com.daliborstakic.graphs.Digraph;[m
+ [m
+ public class ApplicationDigraph {[m
+ 	public static void main(String[] args) {[m
+[31m-		Digraph graph = new Digraph("digraf-konture.txt");[m
+[32m+[m		[32mDigraph graph = new Digraph("dag1.txt");[m
+ 		System.out.println(graph);[m
+ [m
+ 		displayWeakComponents(graph);[m
+[1mdiff --git a/com/daliborstakic/ApplicationWeighted.java b/com/daliborstakic/ApplicationWeighted.java[m
+[1mindex a2e30e7..2dec32a 100644[m
+[1m--- a/com/daliborstakic/ApplicationWeighted.java[m
+[1m+++ b/com/daliborstakic/ApplicationWeighted.java[m
+[36m@@ -1,8 +1,10 @@[m
+ package com.daliborstakic;[m
+ [m
+ import java.util.Arrays;[m
+[32m+[m[32mimport java.util.List;[m
+ import java.util.Map;[m
+ import java.util.Stack;[m
+[32m+[m
+ import com.daliborstakic.graphs.WeightedGraph;[m
+ import com.daliborstakic.util.Edge;[m
+ [m
+[36m@@ -17,6 +19,8 @@[m [mpublic class ApplicationWeighted {[m
+ 		displayShortestPathsFromNode(graph, 0);[m
+ 		displayShortestPathWithWeightLimit(graph, 5, 2, 100.0);[m
+ 		displayShortestPathWithEvenNodes(graph, 9, 0, 10.0);[m
+[32m+[m		[32mdisplayMSTKruskals(graph);[m
+[32m+[m		[32mdisplayMSTKruskalsWithEdge(graph);[m
+ 	}[m
+ [m
+ 	private static void displayMostImportantNode(WeightedGraph graph) {[m
+[36m@@ -63,4 +67,23 @@[m [mpublic class ApplicationWeighted {[m
+ 				+ weightLimit + " and only even nodes: "[m
+ 				+ Arrays.asList(graph.shortestPathEven(source, target, weightLimit)));[m
+ 	}[m
+[32m+[m
+[32m+[m	[32mprivate static void displayMSTKruskals(WeightedGraph graph) {[m
+[32m+[m		[32mList<Edge> mst = graph.kruskals();[m
+[32m+[m
+[32m+[m		[32mSystem.out.println("Minimum Spanning Tree Edges:");[m
+[32m+[m		[32mfor (Edge edge : mst) {[m
+[32m+[m			[32mSystem.out.println(edge.getSource() + " - " + edge.getTarget() + " : " + edge.getWeight());[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate static void displayMSTKruskalsWithEdge(WeightedGraph graph) {[m
+[32m+[m		[32mEdge randomEdge = graph.getRandomEdge();[m
+[32m+[m		[32mList<Edge> mst = graph.kruskalsWithEdge(randomEdge);[m
+[32m+[m
+[32m+[m		[32mSystem.out.println("Minimum Spanning Tree Edges with Edge " + randomEdge + ": ");[m
+[32m+[m		[32mfor (Edge edge : mst) {[m
+[32m+[m			[32mSystem.out.println(edge.getSource() + " - " + edge.getTarget() + " : " + edge.getWeight());[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+ }[m
+[1mdiff --git a/com/daliborstakic/graphs/Digraph.java b/com/daliborstakic/graphs/Digraph.java[m
+[1mindex ffd3ed9..872d189 100644[m
+[1m--- a/com/daliborstakic/graphs/Digraph.java[m
+[1m+++ b/com/daliborstakic/graphs/Digraph.java[m
+[36m@@ -147,7 +147,7 @@[m [mpublic class Digraph {[m
+ 		}[m
+ [m
+ 		while (!stack.isEmpty())[m
+[31m-			topologicalSort.add(stack.pop());[m
+[32m+[m			[32mtopologicalSort.add(stack.pop());[m[41m [m
+ [m
+ 		return topologicalSort;[m
+ 	}[m
+[36m@@ -355,6 +355,7 @@[m [mpublic class Digraph {[m
+ 			for (int neighbor : graph.get(i)) {[m
+ 				sb.append(neighbor).append(" ");[m
+ 			}[m
+[32m+[m
+ 			sb.append("\n");[m
+ 		}[m
+ [m
+[1mdiff --git a/com/daliborstakic/graphs/WeightedGraph.java b/com/daliborstakic/graphs/WeightedGraph.java[m
+[1mindex 3b923d8..836ccc8 100644[m
+[1m--- a/com/daliborstakic/graphs/WeightedGraph.java[m
+[1m+++ b/com/daliborstakic/graphs/WeightedGraph.java[m
+[36m@@ -3,18 +3,36 @@[m [mpackage com.daliborstakic.graphs;[m
+ import java.io.BufferedReader;[m
+ import java.io.File;[m
+ import java.io.FileReader;[m
+[31m-import java.util.*;[m
+[32m+[m[32mimport java.util.ArrayList;[m
+[32m+[m[32mimport java.util.Arrays;[m
+[32m+[m[32mimport java.util.Collections;[m
+[32m+[m[32mimport java.util.HashMap;[m
+[32m+[m[32mimport java.util.HashSet;[m
+[32m+[m[32mimport java.util.List;[m
+[32m+[m[32mimport java.util.Map;[m
+ import java.util.Map.Entry;[m
+[32m+[m[32mimport java.util.PriorityQueue;[m
+[32m+[m[32mimport java.util.Random;[m
+[32m+[m[32mimport java.util.Set;[m
+[32m+[m[32mimport java.util.Stack;[m
+[32m+[m[32mimport java.util.TreeMap;[m
+[32m+[m
+ import com.daliborstakic.util.Edge;[m
+[32m+[m[32mimport com.daliborstakic.util.Subset;[m
+[32m+[m
+ import edu.princeton.cs.algs4.IndexMinPQ;[m
+ [m
+ public class WeightedGraph {[m
+[32m+[m	[32mprivate final static Random random = new Random();[m
+ 	private final Map<Integer, Set<Edge>> graph = new HashMap<>();[m
+ 	private final TreeMap<Double, Set<Integer>> importance = new TreeMap<>(Collections.reverseOrder());[m
+[32m+[m	[32mprivate List<Edge> edges;[m
+ 	private int numOfVertices;[m
+ 	private int numOfEdges;[m
+ [m
+ 	public WeightedGraph(String filename) {[m
+[32m+[m		[32mthis.edges = new ArrayList<>();[m
+[32m+[m
+ 		try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {[m
+ 			numOfVertices = Integer.parseInt(reader.readLine());[m
+ 			numOfEdges = Integer.parseInt(reader.readLine());[m
+[36m@@ -34,6 +52,7 @@[m [mpublic class WeightedGraph {[m
+ 				tempImportance.put(v1, tempImportance.getOrDefault(v1, 0.0) + weight);[m
+ 				tempImportance.put(v2, tempImportance.getOrDefault(v2, 0.0) + weight);[m
+ [m
+[32m+[m				[32mthis.edges.add(new Edge(v1, v2, weight));[m
+ 				addEdge(v1, v2, weight);[m
+ 			}[m
+ [m
+[36m@@ -53,6 +72,10 @@[m [mpublic class WeightedGraph {[m
+ 		return numOfEdges;[m
+ 	}[m
+ [m
+[32m+[m	[32mpublic Edge getRandomEdge() {[m
+[32m+[m		[32mreturn this.edges.get(random.nextInt(0, numOfEdges));[m
+[32m+[m	[32m}[m
+[32m+[m
+ 	public void addEdge(int source, int target, double weight) {[m
+ 		graph.get(source).add(new Edge(source, target, weight));[m
+ 	}[m
+[36m@@ -207,6 +230,54 @@[m [mpublic class WeightedGraph {[m
+ 		return path;[m
+ 	}[m
+ [m
+[32m+[m	[32mpublic List<Edge> kruskals() {[m
+[32m+[m		[32mList<Edge> tree = new ArrayList<>(numOfVertices - 1);[m
+[32m+[m		[32mPriorityQueue<Edge> queue = new PriorityQueue<>(this.edges);[m
+[32m+[m
+[32m+[m		[32mSubset[] subsets = new Subset[numOfVertices];[m
+[32m+[m
+[32m+[m		[32mfor (int i = 0; i < numOfVertices; i++)[m
+[32m+[m			[32msubsets[i] = new Subset(i, 0);[m
+[32m+[m
+[32m+[m		[32maddEdgesToMST(tree, queue, subsets);[m
+[32m+[m
+[32m+[m		[32mreturn tree;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mpublic List<Edge> kruskalsWithEdge(Edge edge) {[m
+[32m+[m		[32mList<Edge> tree = new ArrayList<>(numOfVertices - 1);[m
+[32m+[m		[32mPriorityQueue<Edge> queue = new PriorityQueue<>(this.edges);[m
+[32m+[m
+[32m+[m		[32mSubset[] subsets = new Subset[numOfVertices];[m
+[32m+[m
+[32m+[m		[32mfor (int i = 0; i < numOfVertices; i++)[m
+[32m+[m			[32msubsets[i] = new Subset(i, 0);[m
+[32m+[m
+[32m+[m		[32maddEdgeToMST(tree, subsets, edge);[m
+[32m+[m		[32maddEdgesToMST(tree, queue, subsets);[m
+[32m+[m
+[32m+[m		[32mreturn tree;[m
+[32m+[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate void addEdgesToMST(List<Edge> tree, PriorityQueue<Edge> queue, Subset[] subsets) {[m
+[32m+[m		[32mwhile (!queue.isEmpty()) {[m
+[32m+[m			[32mEdge currentEdge = queue.poll();[m
+[32m+[m
+[32m+[m			[32maddEdgeToMST(tree, subsets, currentEdge);[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mprivate void addEdgeToMST(List<Edge> tree, Subset[] subsets, Edge currentEdge) {[m
+[32m+[m		[32mint x = Subset.findRoot(subsets, currentEdge.getSource());[m
+[32m+[m		[32mint y = Subset.findRoot(subsets, currentEdge.getTarget());[m
+[32m+[m
+[32m+[m		[32mif (x != y) {[m
+[32m+[m			[32mSubset.union(subsets, x, y);[m
+[32m+[m			[32mtree.add(currentEdge);[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+[32m+[m
+ 	@Override[m
+ 	public String toString() {[m
+ 		StringBuilder sb = new StringBuilder();[m
+[1mdiff --git a/com/daliborstakic/util/Edge.java b/com/daliborstakic/util/Edge.java[m
+[1mindex 89d8008..fecf278 100644[m
+[1m--- a/com/daliborstakic/util/Edge.java[m
+[1m+++ b/com/daliborstakic/util/Edge.java[m
+[36m@@ -16,6 +16,14 @@[m [mpublic class Edge implements Comparable<Edge> {[m
+ 		return weight;[m
+ 	}[m
+ [m
+[32m+[m	[32mpublic int getSource() {[m
+[32m+[m		[32mreturn source;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32mpublic int getTarget() {[m
+[32m+[m		[32mreturn target;[m
+[32m+[m	[32m}[m
+[32m+[m
+ 	public int other(int vertex) {[m
+ 		if (source == vertex)[m
+ 			return target;[m
