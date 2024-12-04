@@ -180,9 +180,12 @@ public class WeightedGraph {
 	public Stack<Edge> shortestPathEvenAndOdd(int source, int target, double maxWeight) {
 		double[] distTo = new double[numOfVertices];
 		Edge[] edgeTo = new Edge[numOfVertices];
+
 		Arrays.fill(distTo, Double.POSITIVE_INFINITY);
 		distTo[source] = 0.0;
-		double capacity = maxWeight;
+
+		double capacity[] = new double[numOfVertices];
+		Arrays.fill(capacity, -1);
 
 		IndexMinPQ<Double> pq = new IndexMinPQ<>(numOfVertices);
 		pq.insert(source, 0.0);
@@ -194,23 +197,20 @@ public class WeightedGraph {
 				int w = e.other(v);
 
 				double newWeight = distTo[v] + e.getWeight();
+				double newCapacity = v % 2 == 0 || v == target || v == source ? maxWeight : capacity[v] - e.getWeight();
 
-				if (capacity - e.getWeight() < 0)
+				if (newCapacity < 0)
 					continue;
 
 				if (newWeight < distTo[w]) {
 					distTo[w] = newWeight;
 					edgeTo[w] = e;
+					capacity[w] = newCapacity;
 
 					if (pq.contains(w))
 						pq.decreaseKey(w, newWeight);
 					else
 						pq.insert(w, newWeight);
-
-					if (w % 2 == 0 || w == source || w == target)
-						capacity = maxWeight;
-					else
-						capacity -= e.getWeight();
 				}
 			}
 		}
