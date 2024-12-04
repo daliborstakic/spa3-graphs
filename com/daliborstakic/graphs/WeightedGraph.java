@@ -3,18 +3,36 @@ package com.daliborstakic.graphs;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
+import java.util.Random;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
+
 import com.daliborstakic.util.Edge;
+import com.daliborstakic.util.Subset;
+
 import edu.princeton.cs.algs4.IndexMinPQ;
 
 public class WeightedGraph {
+	private final static Random random = new Random();
 	private final Map<Integer, Set<Edge>> graph = new HashMap<>();
 	private final TreeMap<Double, Set<Integer>> importance = new TreeMap<>(Collections.reverseOrder());
+	private List<Edge> edges;
 	private int numOfVertices;
 	private int numOfEdges;
 
 	public WeightedGraph(String filename) {
+		this.edges = new ArrayList<>();
+
 		try (BufferedReader reader = new BufferedReader(new FileReader(new File(filename)))) {
 			numOfVertices = Integer.parseInt(reader.readLine());
 			numOfEdges = Integer.parseInt(reader.readLine());
@@ -34,6 +52,7 @@ public class WeightedGraph {
 				tempImportance.put(v1, tempImportance.getOrDefault(v1, 0.0) + weight);
 				tempImportance.put(v2, tempImportance.getOrDefault(v2, 0.0) + weight);
 
+				this.edges.add(new Edge(v1, v2, weight));
 				addEdge(v1, v2, weight);
 			}
 
@@ -51,6 +70,10 @@ public class WeightedGraph {
 
 	public int getNumOfEdges() {
 		return numOfEdges;
+	}
+
+	public Edge getRandomEdge() {
+		return this.edges.get(random.nextInt(0, numOfEdges));
 	}
 
 	public void addEdge(int source, int target, double weight) {
@@ -205,6 +228,54 @@ public class WeightedGraph {
 		}
 
 		return path;
+	}
+
+	public List<Edge> kruskals() {
+		List<Edge> tree = new ArrayList<>(numOfVertices - 1);
+		PriorityQueue<Edge> queue = new PriorityQueue<>(this.edges);
+
+		Subset[] subsets = new Subset[numOfVertices];
+
+		for (int i = 0; i < numOfVertices; i++)
+			subsets[i] = new Subset(i, 0);
+
+		addEdgesToMST(tree, queue, subsets);
+
+		return tree;
+	}
+
+	public List<Edge> kruskalsWithEdge(Edge edge) {
+		List<Edge> tree = new ArrayList<>(numOfVertices - 1);
+		PriorityQueue<Edge> queue = new PriorityQueue<>(this.edges);
+
+		Subset[] subsets = new Subset[numOfVertices];
+
+		for (int i = 0; i < numOfVertices; i++)
+			subsets[i] = new Subset(i, 0);
+
+		addEdgeToMST(tree, subsets, edge);
+		addEdgesToMST(tree, queue, subsets);
+
+		return tree;
+
+	}
+
+	private void addEdgesToMST(List<Edge> tree, PriorityQueue<Edge> queue, Subset[] subsets) {
+		while (!queue.isEmpty()) {
+			Edge currentEdge = queue.poll();
+
+			addEdgeToMST(tree, subsets, currentEdge);
+		}
+	}
+
+	private void addEdgeToMST(List<Edge> tree, Subset[] subsets, Edge currentEdge) {
+		int x = Subset.findRoot(subsets, currentEdge.getSource());
+		int y = Subset.findRoot(subsets, currentEdge.getTarget());
+
+		if (x != y) {
+			Subset.union(subsets, x, y);
+			tree.add(currentEdge);
+		}
 	}
 
 	@Override
