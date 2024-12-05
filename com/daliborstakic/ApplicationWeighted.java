@@ -40,18 +40,20 @@ public class ApplicationWeighted {
 	private static void displayShortestPathsFromNode(WeightedGraph graph, int source) {
 		Map<Integer, Stack<Edge>> paths = graph.shortestPaths(source);
 		System.out.println("\n(4) Shortest paths from node " + source + " to all nodes:");
+
 		for (Map.Entry<Integer, Stack<Edge>> entry : paths.entrySet()) {
 			int vertex = entry.getKey();
 			Stack<Edge> path = entry.getValue();
 
 			System.out.print("Path to node " + vertex + ": ");
-			if (path.isEmpty()) {
+			if (vertex == source)
 				System.out.print("Source node");
-			} else {
-				while (!path.isEmpty()) {
+			else if (path.isEmpty())
+				System.out.print("No path to this node");
+			else
+				while (!path.isEmpty())
 					System.out.print(path.pop() + " ");
-				}
-			}
+
 			System.out.println();
 		}
 	}
